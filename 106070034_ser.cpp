@@ -1,12 +1,9 @@
-#ifndef UNICODE
-#define UNICODE
-#endif
-
-#define WIN32_LEAN_AND_MEAN
-
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
+#ifndef UNICODE
+#define UNICODE
+#endif
 
 int main()
 {
@@ -21,9 +18,7 @@ int main()
 
     //----------------------
     SOCKET ListenSocket;
-    sockaddr_in service;
-
-    SOCKET RecvSocket;
+    sockaddr_in serAddr;
     sockaddr_in RecvAddr;
     socklen_t addr_len;
 
@@ -40,12 +35,12 @@ int main()
     // The sockaddr_in structure specifies the address family,
     // IP address, and port for the socket that is being bound.
     
-    service.sin_family = AF_INET;
-    service.sin_addr.s_addr = htonl(INADDR_ANY);
-    service.sin_port = htons(5150);
+    serAddr.sin_family = AF_INET;
+    serAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serAddr.sin_port = htons(5150);
 
     if (bind(ListenSocket,
-             (SOCKADDR *) & service, sizeof (service)) == SOCKET_ERROR) {
+             (SOCKADDR *) & serAddr, sizeof (serAddr)) == SOCKET_ERROR) {
         wprintf(L"bind failed with error: %ld\n", WSAGetLastError());
         closesocket(ListenSocket);
         WSACleanup();
@@ -77,14 +72,9 @@ int main()
     } else
         wprintf(L"Client connected.\n");
     
-    
-    unsigned short Port = 5150;
-
     char RecvBuf[1024];
     char Buffer[1024];
     int BufLen = 1024;
-    int i = 0;
-    iResult = 0;
     int count = 0;
    
    // Receive until the peer closes the connection
@@ -92,33 +82,22 @@ int main()
         iResult = recv(AcceptSocket, RecvBuf, BufLen, 0);
         if ( iResult > 0 ) {
             if (RecvBuf[0] == '1') {
-                // for (int j = 0; j < i; j++){
-                //     printf(Buffer[j]);
-                //     printf("\n");
-                // }
-                // for (int k = 0; k < i; k++)
-                //     send( AcceptSocket, Buffer[k], (int)strlen(Buffer[k]), 0 );
-
-                printf(Buffer);
-
-                send( AcceptSocket, Buffer, (int)strlen(Buffer), 0 );
-            } else {
+                if (count != 0) {
+                    printf(Buffer);
+                    send( AcceptSocket, Buffer, (int)strlen(Buffer), 0 );
+                }   
+            } else if (RecvBuf[0] == '2') {
                 //printf("Bytes received: %d\n", iResult);
                 //printf("RecvBuf received: %s\n", RecvBuf);
 
-                // for (int j = 0; j < iResult; j++) {
-                //     Buffer[i][j] = RecvBuf[j+1];
-                // }
-                // i++;
                 for (int j = 0; j < (int)strlen(RecvBuf)-1; j++) {
                     Buffer[count] = RecvBuf[j+1];
                     count++;
-                    
                 }
                 printf(Buffer);
                 Buffer[count] = '\n';
                 count++;
-                printf("%d", count);
+                //printf("%d", count);
             }
             memset(RecvBuf, NULL, sizeof(RecvBuf));
         }

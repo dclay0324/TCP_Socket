@@ -1,16 +1,9 @@
 #include <iostream>
-#include <cstring>
 #include <winsock2.h>
-
+#include <ws2tcpip.h>
 #ifndef UNICODE
 #define UNICODE
 #endif
-
-#define WIN32_LEAN_AND_MEAN
-
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#define DEFAULT_BUFLEN 1024
 
 using namespace std;
 
@@ -21,10 +14,7 @@ int main(){
     WSADATA wsaData;
 
     SOCKET ConnectSocket = INVALID_SOCKET;
-    struct sockaddr_in clientService; 
-
-    int recvbuflen = DEFAULT_BUFLEN;
-    char recvbuf[DEFAULT_BUFLEN] = "";
+    struct sockaddr_in clientAddress; 
 
     //----------------------
     // Initialize Winsock
@@ -46,13 +36,13 @@ int main(){
     //----------------------
     // The sockaddr_in structure specifies the address family,
     // IP address, and port of the server to be connected to.
-    clientService.sin_family = AF_INET;
-    clientService.sin_addr.s_addr = inet_addr( "127.0.0.1" );
-    clientService.sin_port = htons( 5150 );
+    clientAddress.sin_family = AF_INET;
+    clientAddress.sin_addr.s_addr = inet_addr( "127.0.0.1" );
+    clientAddress.sin_port = htons( 5150 );
 
     //----------------------
     // Connect to server.
-    iResult = connect( ConnectSocket, (SOCKADDR*) &clientService, sizeof(clientService) );
+    iResult = connect( ConnectSocket, (SOCKADDR*) &clientAddress, sizeof(clientAddress) );
     if (iResult == SOCKET_ERROR) {
         wprintf(L"connect failed with error: %d\n", WSAGetLastError() );
         closesocket(ConnectSocket);
@@ -65,7 +55,6 @@ int main(){
     char SendBuf[1024];
     char RecvBuf[1024];
     int BufLen = 1024;
-    int sResult;
     int count = 0;
     
     cout << "---Menu---" << endl;
@@ -78,18 +67,12 @@ int main(){
             if (count == 1){
                 iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
                 cout << "All messages:" << endl;
-                // for (int k = 0; k < count; k++)
-                //     recv(ConnectSocket, RecvBuf[k], BufLen, 0);
-                // for (int k = 0; k < count; k++)
-                //     cout << RecvBuf[k] << endl;
 
                 recv(ConnectSocket, RecvBuf, BufLen, 0);
                 RecvBuf[strlen(RecvBuf)-1] = '\0';
                 printf(RecvBuf);
                 memset(RecvBuf, NULL, sizeof(RecvBuf));
             }
-            
-
         } else if (SendBuf[0] == '2'){
             cout << "Type a new message:" << endl;
             cin >> message;
@@ -109,7 +92,7 @@ int main(){
             memset(SendBuf, NULL, sizeof(SendBuf));
         }
 
-        cout << "---Menu---" << endl;
+        cout << "\n---Menu---" << endl;
         cout << "1. Read all existing messages." << endl;
         cout << "2. Write a new message." << endl;
         cout << "Please type \"1\" or \"2\" to select an option:" << endl;
