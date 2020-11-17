@@ -5,8 +5,9 @@
 #define UNICODE
 #endif
 
-int main()
+int main(int argc, char *argv[])
 {
+    int port = atoi(argv[1]);
 //----------------------
     // Initialize Winsock.
     WSADATA wsaData;
@@ -37,7 +38,7 @@ int main()
     
     serAddr.sin_family = AF_INET;
     serAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serAddr.sin_port = htons(5150);
+    serAddr.sin_port = htons(port);
 
     if (bind(ListenSocket,
              (SOCKADDR *) & serAddr, sizeof (serAddr)) == SOCKET_ERROR) {
@@ -76,7 +77,7 @@ int main()
     char Buffer[1024];
     int BufLen = 1024;
     int count = 0;
-   
+    memset(RecvBuf, NULL, sizeof(RecvBuf));
    // Receive until the peer closes the connection
     do {
         iResult = recv(AcceptSocket, RecvBuf, BufLen, 0);

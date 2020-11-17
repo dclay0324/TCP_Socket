@@ -7,7 +7,8 @@
 
 using namespace std;
 
-int main(){
+int main(int argc, char *argv[]){
+
     //----------------------
     // Declare and initialize variables.
     int iResult;
@@ -37,8 +38,8 @@ int main(){
     // The sockaddr_in structure specifies the address family,
     // IP address, and port of the server to be connected to.
     clientAddress.sin_family = AF_INET;
-    clientAddress.sin_addr.s_addr = inet_addr( "127.0.0.1" );
-    clientAddress.sin_port = htons( 5150 );
+    clientAddress.sin_addr.s_addr = inet_addr( argv[1] );
+    clientAddress.sin_port = htons( atoi(argv[2]) );
 
     //----------------------
     // Connect to server.
@@ -55,7 +56,10 @@ int main(){
     char SendBuf[1024];
     char RecvBuf[1024];
     int BufLen = 1024;
-    int count = 0;
+    int flag = 0;
+
+    memset(SendBuf, NULL, sizeof(SendBuf));
+    memset(RecvBuf, NULL, sizeof(RecvBuf));
     
     cout << "---Menu---" << endl;
     cout << "1. Read all existing messages." << endl;
@@ -64,12 +68,12 @@ int main(){
     
     while (cin >> SendBuf[0]) {
         if (SendBuf[0] == '1') {
-            if (count == 1){
+            if (flag == 1){
                 iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
                 cout << "All messages:" << endl;
 
                 recv(ConnectSocket, RecvBuf, BufLen, 0);
-                RecvBuf[strlen(RecvBuf)-1] = '\0';
+                RecvBuf[(int)strlen(RecvBuf)-1] = '\0';
                 printf(RecvBuf);
                 memset(RecvBuf, NULL, sizeof(RecvBuf));
             }
@@ -80,14 +84,13 @@ int main(){
             //----------------------
             // Send an initial buffer
             iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
-            count = 1;
+            flag = 1;
             if (iResult == SOCKET_ERROR) {
                 wprintf(L"send failed with error: %d\n", WSAGetLastError());
                 closesocket(ConnectSocket);
                 WSACleanup();
                 return 1;
             }
-
             //printf("Bytes Sent: %d\n", iResult);
             memset(SendBuf, NULL, sizeof(SendBuf));
         }
