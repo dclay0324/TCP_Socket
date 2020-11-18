@@ -108,12 +108,20 @@ int main(int argc, char *argv[]){
         printf("---Menu---\n1. Read all existing messages.\n2. Write a new message.\nPlease type \"1\" or \"2\" to select an option:\n");
         char c = getchar();
         if (c == EOF) exit(1);
-        else SendBuf[0] = c;
-        // getchar();
+        else if (c == '1'){
+            getchar();
+        	SendBuf[0] = c;
+		} else SendBuf[0] = c;
 
         if (SendBuf[0] == '1') {
             if (flag == 1){
                 iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
+                if (iResult == SOCKET_ERROR) {
+                    wprintf(L"send failed with error: %d\n", WSAGetLastError());
+                    closesocket(ConnectSocket);
+                    WSACleanup();
+                    return 1;
+                }
                 printf("All messages:\n");
 
                 recv(ConnectSocket, RecvBuf, BufLen, 0);
@@ -124,12 +132,12 @@ int main(int argc, char *argv[]){
                 printf("\n");
                 memset(SendBuf, NULL, sizeof(SendBuf));
                 memset(RecvBuf, NULL, sizeof(RecvBuf)); 
-            } else printf("There is no any messages.\n");
+            } else printf("There is no any messages.\n\n");
         } else if (SendBuf[0] == '2'){
             printf("Type a new message:\n");
             char msg = getchar();
-            for (i = 0, msg = getchar(); msg != '\n'; msg = getchar(), i++) SendBuf[i+1] = msg;
-            SendBuf[i+1] = '\0';
+            for (i = 1, msg = getchar(); msg != '\n'; msg = getchar(), i++) SendBuf[i] = msg;
+            SendBuf[i] = '\0';
             
             //----------------------
             // Send an initial buffer
@@ -141,7 +149,7 @@ int main(int argc, char *argv[]){
                 WSACleanup();
                 return 1;
             }
-            //printf("Bytes Sent: %d\n", iResult);
+            //printf("Message Sent: %s\n", SendBuf);
             printf("\n");
             memset(SendBuf, NULL, sizeof(SendBuf));
         }

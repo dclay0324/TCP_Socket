@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     //----------------------
     // The sockaddr_in structure specifies the address family,
     // IP address, and port for the socket that is being bound.
-    
+
     serAddr.sin_family = AF_INET;
     serAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serAddr.sin_port = htons(port);
@@ -73,11 +73,11 @@ int main(int argc, char *argv[])
         return 1;
     } else
         wprintf(L"Client connected.\n");
-    
+
     char RecvBuf[1024];
     char Buffer[1024];
     int BufLen = 1024;
-    int count = 0;
+    int flag = 0;
     memset(RecvBuf, NULL, sizeof(RecvBuf));
    // Receive until the peer closes the connection
     do {
@@ -85,24 +85,26 @@ int main(int argc, char *argv[])
         iResult = recv(AcceptSocket, RecvBuf, BufLen, 0);
         if ( iResult > 0 ) {
             if (RecvBuf[0] == '1') {
-                if (count != 0) {
+                if (flag != 0) {
                     printf(Buffer);
                     send( AcceptSocket, Buffer, (int)strlen(Buffer), 0 );
-                }   
+
+                    memset(RecvBuf, NULL, sizeof(RecvBuf));
+                }
             } else if (RecvBuf[0] == '2') {
                 //printf("Bytes received: %d\n", iResult);
-                //printf("RecvBuf received: %s\n", RecvBuf);
+                printf("RecvBuf received: %s\n", RecvBuf);
 
-                for (int j = 0; j < (int)strlen(RecvBuf)-1; j++) {
-                    Buffer[count] = RecvBuf[j+1];
-                    count++;
+                for (int j = 0; j < (int)strlen(RecvBuf); j++) {
+                    RecvBuf[j] = RecvBuf[j+1];
                 }
-                printf(Buffer);
-                Buffer[count] = '\n';
-                count++;
-                //printf("%d", count);
+                strcat(Buffer, RecvBuf);
+                strcat(Buffer, "\n");
+                //printf(Buffer);
+ 
+                flag = 1;
+                memset(RecvBuf, NULL, sizeof(RecvBuf));
             }
-            memset(RecvBuf, NULL, sizeof(RecvBuf));
         }
         else if ( iResult == 0 )
             printf("Connection closed\n");
