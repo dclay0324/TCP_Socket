@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
 
     //----------------------
     SOCKET ListenSocket;
-    sockaddr_in serAddr;
-    sockaddr_in RecvAddr;
+    struct sockaddr_in serAddr;
+    struct sockaddr_in RecvAddr;
     socklen_t addr_len;
 
     //----------------------
@@ -86,14 +86,14 @@ int main(int argc, char *argv[])
         if ( iResult > 0 ) {
             if (RecvBuf[0] == '1') {
                 if (flag != 0) {
-                    printf(Buffer);
+                    //printf(Buffer);
                     send( AcceptSocket, Buffer, (int)strlen(Buffer), 0 );
 
                     memset(RecvBuf, NULL, sizeof(RecvBuf));
                 }
             } else if (RecvBuf[0] == '2') {
                 //printf("Bytes received: %d\n", iResult);
-                printf("RecvBuf received: %s\n", RecvBuf);
+                //printf("RecvBuf received: %s\n", RecvBuf);
 
                 for (int j = 0; j < (int)strlen(RecvBuf); j++) {
                     RecvBuf[j] = RecvBuf[j+1];
