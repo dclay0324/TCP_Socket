@@ -1,6 +1,7 @@
+#include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <stdio.h>
+
 #ifndef UNICODE
 #define UNICODE
 #endif
@@ -80,6 +81,7 @@ int main(int argc, char *argv[])
     memset(RecvBuf, NULL, sizeof(RecvBuf));
    // Receive until the peer closes the connection
     do {
+        //Buffer = '---Menu---\n1. Read all existing messages.\n2. Write a new message.\nPlease type \"1\" or \"2\" to select an option:\n";
         iResult = recv(AcceptSocket, RecvBuf, BufLen, 0);
         if ( iResult > 0 ) {
             if (RecvBuf[0] == '1') {

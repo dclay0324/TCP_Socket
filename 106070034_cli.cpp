@@ -1,11 +1,13 @@
-#include <iostream>
+//#include <iostream>
+#include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+
 #ifndef UNICODE
 #define UNICODE
 #endif
 
-using namespace std;
+//using namespace std;
 
 int main(int argc, char *argv[]){
 
@@ -51,7 +53,8 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    int type;
+    int i;
+    char type;
     char message[1024];
     char SendBuf[1024];
     char RecvBuf[1024];
@@ -61,26 +64,73 @@ int main(int argc, char *argv[]){
     memset(SendBuf, NULL, sizeof(SendBuf));
     memset(RecvBuf, NULL, sizeof(RecvBuf));
     
-    cout << "---Menu---" << endl;
-    cout << "1. Read all existing messages." << endl;
-    cout << "2. Write a new message." << endl;
-    cout << "Please type \"1\" or \"2\" to select an option:" << endl; 
+    // cout << "---Menu---" << endl;
+    // cout << "1. Read all existing messages." << endl;
+    // cout << "2. Write a new message." << endl;
+    // cout << "Please type \"1\" or \"2\" to select an option:" << endl; 
     
-    while (cin >> SendBuf[0]) {
+    // while (cin >> SendBuf[0]) {
+    //     if (SendBuf[0] == '1') {
+    //         if (flag == 1){
+    //             iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
+    //             cout << "All messages:" << endl;
+
+    //             recv(ConnectSocket, RecvBuf, BufLen, 0);
+    //             RecvBuf[(int)strlen(RecvBuf)-1] = '\0';
+    //             printf(RecvBuf);
+    //             memset(RecvBuf, NULL, sizeof(RecvBuf));
+    //         }
+    //     } else if (SendBuf[0] == '2'){
+    //         cout << "Type a new message:" << endl;
+    //         cin >> message;
+    //         strcat(SendBuf, message);
+    //         //----------------------
+    //         // Send an initial buffer
+    //         iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
+    //         flag = 1;
+    //         if (iResult == SOCKET_ERROR) {
+    //             wprintf(L"send failed with error: %d\n", WSAGetLastError());
+    //             closesocket(ConnectSocket);
+    //             WSACleanup();
+    //             return 1;
+    //         }
+    //         //printf("Bytes Sent: %d\n", iResult);
+    //         memset(SendBuf, NULL, sizeof(SendBuf));
+    //     }
+
+    //     cout << "\n---Menu---" << endl;
+    //     cout << "1. Read all existing messages." << endl;
+    //     cout << "2. Write a new message." << endl;
+    //     cout << "Please type \"1\" or \"2\" to select an option:" << endl;
+    // }
+
+    while (1) {
+        printf("---Menu---\n1. Read all existing messages.\n2. Write a new message.\nPlease type \"1\" or \"2\" to select an option:\n");
+        char c = getchar();
+        if (c == EOF) exit(1);
+        else SendBuf[0] = c;
+        // getchar();
+
         if (SendBuf[0] == '1') {
             if (flag == 1){
                 iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
-                cout << "All messages:" << endl;
+                printf("All messages:\n");
 
                 recv(ConnectSocket, RecvBuf, BufLen, 0);
-                RecvBuf[(int)strlen(RecvBuf)-1] = '\0';
-                printf(RecvBuf);
-                memset(RecvBuf, NULL, sizeof(RecvBuf));
-            }
+                for (int j = 0; j < (int)strlen(RecvBuf); j++){
+                    if (RecvBuf[j] == '\0') printf("\n");
+                    else printf("%c", RecvBuf[j]);
+                }
+                printf("\n");
+                memset(SendBuf, NULL, sizeof(SendBuf));
+                memset(RecvBuf, NULL, sizeof(RecvBuf)); 
+            } else printf("There is no any messages.\n");
         } else if (SendBuf[0] == '2'){
-            cout << "Type a new message:" << endl;
-            cin >> message;
-            strcat(SendBuf, message);
+            printf("Type a new message:\n");
+            char msg = getchar();
+            for (i = 0, msg = getchar(); msg != '\n'; msg = getchar(), i++) SendBuf[i+1] = msg;
+            SendBuf[i+1] = '\0';
+            
             //----------------------
             // Send an initial buffer
             iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
@@ -92,13 +142,9 @@ int main(int argc, char *argv[]){
                 return 1;
             }
             //printf("Bytes Sent: %d\n", iResult);
+            printf("\n");
             memset(SendBuf, NULL, sizeof(SendBuf));
         }
-
-        cout << "\n---Menu---" << endl;
-        cout << "1. Read all existing messages." << endl;
-        cout << "2. Write a new message." << endl;
-        cout << "Please type \"1\" or \"2\" to select an option:" << endl;
     }
 
     closesocket(ConnectSocket);
