@@ -75,42 +75,52 @@ int main(int argc, char *argv[])
         wprintf(L"Client connected.\n");
 
     char RecvBuf[1024];
+    char SendBuf[1024];
     char Buffer[1024];
     int BufLen = 1024;
     int flag = 0;
-    memset(RecvBuf, NULL, sizeof(RecvBuf));
-   // Receive until the peer closes the connection
+    char Menu[] = "---Menu---\n1. Read all existing messages.\n2. Write a new message.\nPlease type \"1\" or \"2\" to select an option:\n";
+    char AllMsg[] = "All messages:\n";
+    char NewMsg[] = "Type a new message:\n";
+
+    // Receive until the peer closes the connection
     do {
-        //Buffer = '---Menu---\n1. Read all existing messages.\n2. Write a new message.\nPlease type \"1\" or \"2\" to select an option:\n";
+        send(AcceptSocket, Menu, (int)strlen(Menu), 0);
         iResult = recv(AcceptSocket, RecvBuf, BufLen, 0);
         if ( iResult > 0 ) {
             if (RecvBuf[0] == '1') {
                 if (flag != 0) {
                     //printf(Buffer);
-                    send( AcceptSocket, Buffer, (int)strlen(Buffer), 0 );
+                    strcat(SendBuf, AllMsg);
+                    strcat(SendBuf, Buffer);
+                    strcat(SendBuf, "\n");
 
+                    send(AcceptSocket, SendBuf, (int)strlen(SendBuf), 0);
+
+                    memset(SendBuf, NULL, sizeof(SendBuf));
                     memset(RecvBuf, NULL, sizeof(RecvBuf));
                 }
             } else if (RecvBuf[0] == '2') {
                 //printf("Bytes received: %d\n", iResult);
                 //printf("RecvBuf received: %s\n", RecvBuf);
+                memset(RecvBuf, NULL, sizeof(RecvBuf));
 
-                for (int j = 0; j < (int)strlen(RecvBuf); j++) {
-                    RecvBuf[j] = RecvBuf[j+1];
-                }
+                send(AcceptSocket, NewMsg, (int)strlen(NewMsg), 0);
+                recv(AcceptSocket, RecvBuf, BufLen, 0);
+
                 strcat(Buffer, RecvBuf);
                 strcat(Buffer, "\n");
                 //printf(Buffer);
  
                 flag = 1;
                 memset(RecvBuf, NULL, sizeof(RecvBuf));
+                //send (AcceptSocket, Menu, (int)strlen(Menu), 0);
             }
         }
         else if ( iResult == 0 )
             printf("Connection closed\n");
         else
             printf("recv failed: %d\n", WSAGetLastError());
-
     } while( iResult > 0 );
 
     // No longer need server socket
