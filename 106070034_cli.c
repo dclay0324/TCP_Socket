@@ -42,7 +42,8 @@ int main(int argc, char *argv[]){
 
     //----------------------
     // Connect to server.
-    iResult = connect( ConnectSocket, (SOCKADDR*) &clientAddress, sizeof(clientAddress) );
+    iResult = connect(ConnectSocket,
+                      (SOCKADDR*) &clientAddress, sizeof(clientAddress));
     if (iResult == SOCKET_ERROR) {
         wprintf(L"connect failed with error: %d\n", WSAGetLastError() );
         closesocket(ConnectSocket);
@@ -88,7 +89,8 @@ int main(int argc, char *argv[]){
             printf("%s", RecvBuf);
             
             char msg = getchar();
-            for (i = 0, msg = getchar(); msg != '\n'; msg = getchar(), i++) SendBuf[i] = msg;
+            for (i = 0, msg = getchar(); msg != '\n'; msg = getchar(), i++) 
+                SendBuf[i] = msg;
             printf("\n");
             //----------------------
             // Send an initial buffer
