@@ -90,7 +90,6 @@ int main(int argc, char *argv[])
         if ( iResult > 0 ) {
             if (RecvBuf[0] == '1') {
                 if (flag != 0) {
-                    //printf(Buffer);
                     strcat(SendBuf, AllMsg);
                     strcat(SendBuf, Buffer);
                     strcat(SendBuf, "\n");
@@ -101,8 +100,6 @@ int main(int argc, char *argv[])
                     memset(RecvBuf, NULL, sizeof(RecvBuf));
                 }
             } else if (RecvBuf[0] == '2') {
-                //printf("Bytes received: %d\n", iResult);
-                //printf("RecvBuf received: %s\n", RecvBuf);
                 memset(RecvBuf, NULL, sizeof(RecvBuf));
 
                 send(AcceptSocket, NewMsg, (int)strlen(NewMsg), 0);
@@ -110,11 +107,9 @@ int main(int argc, char *argv[])
 
                 strcat(Buffer, RecvBuf);
                 strcat(Buffer, "\n");
-                //printf(Buffer);
  
                 flag = 1;
                 memset(RecvBuf, NULL, sizeof(RecvBuf));
-                //send (AcceptSocket, Menu, (int)strlen(Menu), 0);
             }
         }
         else if ( iResult == 0 )

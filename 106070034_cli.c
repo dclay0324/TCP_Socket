@@ -57,13 +57,7 @@ int main(int argc, char *argv[]){
     int BufLen = 1024;
     int flag = 0;
 
-    // memset(SendBuf, NULL, sizeof(SendBuf));
-    // memset(RecvBuf, NULL, sizeof(RecvBuf));
-    // memset(Menu, NULL, sizeof(Menu));
-
-    //recv(ConnectSocket, Menu, BufLen, 0);
     while (1) {
-        //printf("---Menu---\n1. Read all existing messages.\n2. Write a new message.\nPlease type \"1\" or \"2\" to select an option:\n");
         recv(ConnectSocket, Menu, BufLen, 0);
         printf("%s", Menu);
 
@@ -78,15 +72,7 @@ int main(int argc, char *argv[]){
 
         if (SendBuf[0] == '1') {
             if (flag == 1){
-                //iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
-                //printf("All messages:\n");
-
                 recv(ConnectSocket, RecvBuf, BufLen, 0);
-                // for (int j = 0; j < (int)strlen(RecvBuf); j++){
-                //     if (RecvBuf[j] == '\0') printf("\n");
-                //     else printf("%c", RecvBuf[j]);
-                // }
-                // printf("\n");
                 printf("%s", RecvBuf);
                 
                 memset(SendBuf, NULL, sizeof(SendBuf));
@@ -97,31 +83,22 @@ int main(int argc, char *argv[]){
             }
         } else if (SendBuf[0] == '2'){
             memset(SendBuf, NULL, sizeof(SendBuf));
-            //printf("Type a new message:\n");
+
             recv(ConnectSocket, RecvBuf, BufLen, 0);
             printf("%s", RecvBuf);
             
             char msg = getchar();
             for (i = 0, msg = getchar(); msg != '\n'; msg = getchar(), i++) SendBuf[i] = msg;
-            
+            printf("\n");
             //----------------------
             // Send an initial buffer
             iResult = send( ConnectSocket, SendBuf, (int)strlen(SendBuf), 0 );
             flag = 1;
-            if (iResult == SOCKET_ERROR) {
-                wprintf(L"send failed with error: %d\n", WSAGetLastError());
-                closesocket(ConnectSocket);
-                WSACleanup();
-                return 1;
-            }
-            //printf("Message Sent: %s\n", SendBuf);
-            printf("\n");
+            
             memset(RecvBuf, NULL, sizeof(RecvBuf));
             memset(SendBuf, NULL, sizeof(SendBuf));
             memset(Menu, NULL, sizeof(Menu));
-            //recv(ConnectSocket, Menu, BufLen, 0);
         }
-        //recv(ConnectSocket, Menu, BufLen, 0);
     }
 
     closesocket(ConnectSocket);
